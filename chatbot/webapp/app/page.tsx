@@ -32,17 +32,20 @@ export default function HomePage() {
         body: JSON.stringify({ message: content }),
       });
 
-      if (!res.ok) throw new Error("Request failed");
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText);
+      }
 
       const data = await res.json();
       setMessages((prev) => [...prev, data]);
-    } catch {
+    } catch (err) {
       setMessages((prev) => [
         ...prev,
         {
           id: crypto.randomUUID(),
           role: "assistant",
-          content: "Something went wrong. Please try again.",
+          content: "Something went wrong reaching the agent. Please try again.",
         },
       ]);
     } finally {
@@ -52,11 +55,11 @@ export default function HomePage() {
 
   return (
     <main className="h-screen flex flex-col bg-[var(--bg-base)]">
-      {/* Scrollable area */}
+      {/* Scrollable messages */}
       <div className="flex-1 overflow-y-auto">
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-4">
-            <div className="assistant-avatar w-12 h-12 rounded-2xl">
+          <div className="flex flex-col items-center justify-center h-full gap-4 text-center px-4">
+            <div className="assistant-avatar w-14 h-14 rounded-2xl">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -69,12 +72,39 @@ export default function HomePage() {
                 <circle cx="15" cy="14" r="1.2" fill="currentColor" />
               </svg>
             </div>
-            <h1 className="text-xl font-semibold text-[var(--text-primary)]">
-              Welcome to DolFin AI
-            </h1>
-            <p className="text-sm text-[var(--text-secondary)] max-w-xs">
-              Ask me about stocks, risk analysis, or your portfolio.
-            </p>
+            <div>
+              <h1 className="text-2xl font-semibold text-[var(--text-primary)] mb-1">
+                Welcome to DolFin AI
+              </h1>
+              <p className="text-sm text-[var(--text-secondary)] max-w-sm">
+                Ask me about stock forecasts, risk assessments, or market
+                education.
+              </p>
+            </div>
+            {/* Suggestion chips */}
+            <div className="flex flex-wrap gap-2 justify-center mt-2 max-w-lg">
+              {[
+                "Forecast AAPL for the next 30 days",
+                "What is the risk profile of TSLA?",
+                "Explain dollar cost averaging",
+                "Is NVDA a good investment right now?",
+              ].map((suggestion) => (
+                <button
+                  key={suggestion}
+                  onClick={() => handleSend(suggestion)}
+                  className="
+                    text-xs px-3 py-2 rounded-xl
+                    border border-[var(--border)]
+                    bg-[var(--bg-surface)] text-[var(--text-secondary)]
+                    hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-2)]
+                    hover:border-[var(--border-input)]
+                    transition-all duration-150
+                  "
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="max-w-2xl mx-auto w-full px-4 sm:px-6 pt-8 pb-48 flex flex-col gap-8">
@@ -86,6 +116,7 @@ export default function HomePage() {
               ),
             )}
 
+            {/* Typing indicator */}
             {isLoading && (
               <div className="message-assistant">
                 <div className="assistant-header">

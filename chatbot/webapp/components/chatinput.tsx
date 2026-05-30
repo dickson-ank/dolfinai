@@ -92,10 +92,6 @@ export default function ChatInput({
           </svg>
         </button>
       </div>
-
-      <p className="footer-label">
-        DolFin AI · Market data for informational purposes only
-      </p>
     </div>
   );
 }

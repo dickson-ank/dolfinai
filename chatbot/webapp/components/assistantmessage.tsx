@@ -2,14 +2,74 @@ import type { Message } from "@/types";
 
 const riskBarWidth = { low: "28%", medium: "62%", high: "92%" };
 
-function HighlightedContent({
+function FormattedContent({
   content,
   highlights,
 }: {
   content: string;
   highlights?: string[];
 }) {
-  if (!highlights?.length) return <>{content}</>;
+  // Split into paragraphs on double newlines
+  const paragraphs = content.split(/\n\n+/).filter(Boolean);
+
+  return (
+    <>
+      {paragraphs.map((para, pi) => {
+        // Handle single newlines as line breaks within a paragraph
+        const lines = para.split(/\n/).filter(Boolean);
+
+        return (
+          <p key={pi} className="mb-3 last:mb-0">
+            {lines.map((line, li) => (
+              <span key={li}>
+                {renderLine(line, highlights)}
+                {li < lines.length - 1 && <br />}
+              </span>
+            ))}
+          </p>
+        );
+      })}
+    </>
+  );
+}
+
+function renderLine(line: string, highlights?: string[]) {
+  // Handle **bold** markdown
+  const boldPattern = /\*\*(.*?)\*\*/g;
+  const parts: React.ReactNode[] = [];
+  let last = 0;
+  let match;
+
+  while ((match = boldPattern.exec(line)) !== null) {
+    if (match.index > last) {
+      parts.push(
+        <span key={last}>
+          {highlightText(line.slice(last, match.index), highlights)}
+        </span>,
+      );
+    }
+    parts.push(
+      <strong
+        key={match.index}
+        className="font-semibold text-[var(--text-primary)]"
+      >
+        {match[1]}
+      </strong>,
+    );
+    last = match.index + match[0].length;
+  }
+
+  if (last < line.length) {
+    parts.push(
+      <span key={last}>{highlightText(line.slice(last), highlights)}</span>,
+    );
+  }
+
+  return parts.length > 0 ? parts : highlightText(line, highlights);
+}
+
+function highlightText(text: string, highlights?: string[]) {
+  if (!highlights?.length) return text;
 
   const pattern = new RegExp(
     `(${highlights
@@ -18,9 +78,10 @@ function HighlightedContent({
     "g",
   );
 
+  const parts = text.split(pattern);
   return (
     <>
-      {content.split(pattern).map((part, i) =>
+      {parts.map((part, i) =>
         highlights.includes(part) ? (
           <span key={i} className="ai-body-highlight">
             {part}
@@ -38,6 +99,7 @@ export function AssistantMessage({ message }: { message: Message }) {
 
   return (
     <div className="message-assistant animate-in">
+      {/* Header */}
       <div className="assistant-header">
         <div className="assistant-avatar">
           <svg
@@ -55,6 +117,7 @@ export function AssistantMessage({ message }: { message: Message }) {
         <span className="assistant-name">DolFin</span>
       </div>
 
+      {/* Stock card */}
       {message.stockCard && (
         <div className="stock-card">
           <div className="stock-card-left">
@@ -100,6 +163,7 @@ export function AssistantMessage({ message }: { message: Message }) {
         </div>
       )}
 
+      {/* Risk card */}
       {message.riskProfile && (
         <div className="risk-card">
           <div className="risk-icon">
@@ -121,20 +185,25 @@ export function AssistantMessage({ message }: { message: Message }) {
           </div>
           <div className="risk-bar-track">
             <div
-              className={`risk-bar-fill ${message.riskProfile.level === "low" ? "" : message.riskProfile.level}`}
+              className={`risk-bar-fill ${
+                message.riskProfile.level === "low"
+                  ? ""
+                  : message.riskProfile.level
+              }`}
               style={{ width: riskBarWidth[message.riskProfile.level] }}
             />
           </div>
         </div>
       )}
 
+      {/* Body text */}
       {message.content && (
-        <p className="text-[15px] leading-[1.7] text-[var(--text-primary)]">
-          <HighlightedContent
+        <div className="text-[15px] leading-[1.7] text-[var(--text-primary)]">
+          <FormattedContent
             content={message.content}
             highlights={message.highlights}
           />
-        </p>
+        </div>
       )}
     </div>
   );

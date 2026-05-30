@@ -3,7 +3,9 @@ name = "dolfinai"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11,<3.14"
 dependencies = [
-    "google-adk>=2.1.0",
+    "google-adk>=1.0.0,<2.0.0",
+    "google-cloud-aiplatform[adk,agent-engines]>=1.112",
+    "google-genai>=1.75.0",
 ]
