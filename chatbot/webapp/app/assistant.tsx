@@ -1,7 +1,7 @@
 "use client";
 
-import { AssistantRuntimeProvider } from "@assistant-ui/react";
-import { useExternalStoreRuntime } from "@assistant-ui/react";
+import { AssistantRuntimeProvider, useExternalStoreRuntime } from "@assistant-ui/react";
+import type { AppendMessage } from "@assistant-ui/react";
 import { Thread } from "@/components/thread";
 import {
   SidebarInset,
@@ -34,7 +34,7 @@ export const Assistant = () => {
   const threadIdRef = useRef<string | undefined>(undefined);
 
   const onNew = useCallback(
-    async (message: { content: Array<{ type: string; text?: string }> }) => {
+    async (message: AppendMessage) => {
       const userText = message.content
         .filter((c) => c.type === "text")
         .map((c) => c.text ?? "")
