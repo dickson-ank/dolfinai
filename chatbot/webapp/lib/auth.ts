@@ -27,8 +27,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!identity) {
           // create new user
           userId = await createUser({
-            email: profile.email,
-            name: profile.name,
+            email: profile.email ?? undefined,
+            name: profile.name ?? undefined,
             image: profile.picture,
           });
 
