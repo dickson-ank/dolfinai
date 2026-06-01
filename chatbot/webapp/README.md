@@ -1,8 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is the [assistant-ui](https://github.com/assistant-ui/assistant-ui) starter project with [Assistant Cloud](https://cloud.assistant-ui.com) integration.
 
 ## Getting Started
 
-First, run the development server:
+### 1. Set up Assistant Cloud
+
+1. Sign up for Assistant Cloud at [cloud.assistant-ui.com](https://cloud.assistant-ui.com)
+2. Create a new project in your Assistant Cloud dashboard
+3. Navigate to your project settings to get:
+   - Your Assistant Cloud API URL
+   - Your Assistant Cloud API Key
+
+### 2. Configure Environment Variables
+
+Create a `.env.local` file in the root directory and add your credentials:
+
+```
+# Provider API Key
+OPENAI_API_KEY=your-openai-api-key
+
+# Assistant Cloud
+NEXT_PUBLIC_ASSISTANT_BASE_URL=your-assistant-cloud-url
+ASSISTANT_API_KEY=your-assistant-cloud-api-key
+```
+
+### 3. Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
+
+### 4. Run the Development Server
 
 ```bash
 npm run dev
@@ -16,21 +49,13 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+You can start customizing the UI by modifying components in the `components/assistant-ui/` directory.
 
-## Learn More
+### Key Files
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `app/assistant.tsx` - Renders the chat interface and sets up the runtime provider with Assistant Cloud
+- `app/api/chat/route.ts` - Chat API endpoint
+- `components/assistant-ui/thread.tsx` - Chat thread component
+- `components/assistant-ui/threadlist-sidebar.tsx` - Sidebar with thread list
