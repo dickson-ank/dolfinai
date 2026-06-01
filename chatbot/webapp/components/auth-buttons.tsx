@@ -1,10 +1,13 @@
 "use client";
 
 import { signIn, signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 
 function LoginButton() {
   return (
-    <button
+    <Button
+    variant="outline"
+      className="rounded-xl p-2 text-white text-xs"
       onClick={() =>
         signIn("google", {
           redirectTo: "/",
@@ -12,12 +15,18 @@ function LoginButton() {
       }
     >
       Sign in with Google
-    </button>
+    </Button>
   );
 }
 
 function SignOutButton() {
-  return <button onClick={() => signOut()}>Sign Out</button>;
+  return (
+    <Button variant="destructive" 
+    className="rounded-xl p-2 text-xs"
+    onClick={() => signOut()}>
+      Sign Out
+    </Button>
+  );
 }
 
 export { LoginButton, SignOutButton };

@@ -140,28 +140,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-.composer-shadow {
-  position: relative;
-}
-
-.composer-shadow::after {
-  content: "";
-  position: absolute;
-
-  inset: -2px;
-
-  border-radius: inherit;
-  pointer-events: none;
-
-  opacity: 0;
-  transition: opacity 200ms ease;
-}
-
-.composer-shadow:focus-within::after {
-  opacity: 1;
-
-  box-shadow:
-    0 0 20px 4px rgba(71, 147, 255, 0.3),
-    0 0 50px 12px rgba(71, 147, 255, 0.1);
-}
