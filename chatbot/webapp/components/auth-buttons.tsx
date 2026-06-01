@@ -7,14 +7,14 @@ function LoginButton() {
   return (
     <Button
     variant="outline"
-      className="rounded-xl p-2 text-white text-xs"
+      className="rounded-xl p-2 text-white text-xs md:p-1"
       onClick={() =>
         signIn("google", {
           redirectTo: "/",
         })
       }
     >
-      Sign in with Google
+      Sign In
     </Button>
   );
 }
