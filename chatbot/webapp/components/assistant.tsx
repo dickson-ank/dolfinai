@@ -29,6 +29,7 @@ import { LoginButton, SignOutButton } from "@/components/auth-buttons";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useThreads } from "@/lib/hooks/use-threads";
 import { useMessages } from "@/lib/hooks/use-messages";
+import { useUser } from "@/lib/user-creds-provider";
 
 type Message = {
   id: string;
@@ -41,6 +42,8 @@ export const Assistant = ({
 }: {
   initialThreadId?: string | null;
 }) => {
+  const user = useUser();
+
   const router = useRouter();
 
   const { threads, loading: loadingThreads, reloadThreads } = useThreads();
@@ -248,7 +251,7 @@ export const Assistant = ({
           />
 
           <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+            <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4">
               <SidebarTrigger />
 
               <Breadcrumb>
@@ -266,6 +269,7 @@ export const Assistant = ({
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
+              {user?.email ? <SignOutButton /> : <LoginButton />}
             </header>
 
             <div className="flex-1 overflow-hidden">

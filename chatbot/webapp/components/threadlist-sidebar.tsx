@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { useUser } from "@/lib/user-creds-provider";
 
 import {
   Sidebar,
@@ -14,10 +13,10 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { SignOutButton, LoginButton } from "@/components/auth-buttons";
 
 import { ThreadList } from "@/components/thread-list";
 import type { Thread } from "@/lib/hooks/use-threads";
+import { useUser } from "@/lib/user-creds-provider";
 
 type ThreadListSidebarProps = React.ComponentProps<typeof Sidebar> & {
   threads: Thread[];
@@ -36,7 +35,6 @@ export const ThreadListSidebar = React.memo(function ThreadListSidebar({
   ...props
 }: ThreadListSidebarProps) {
   const user = useUser();
-
   return (
     <Sidebar {...props}>
       <SidebarHeader className="aui-sidebar-header mb-2 border-b">
@@ -77,7 +75,7 @@ export const ThreadListSidebar = React.memo(function ThreadListSidebar({
 
       <SidebarFooter className="aui-sidebar-footer border-t">
         <SidebarMenu>
-          <SidebarMenuItem className="mt-2 flex flex-col items-start justify-center">
+          <SidebarMenuItem className="mt-2 flex flex-col items-start ">
             <SidebarMenuButton size="lg" asChild>
               <div>
                 <Image
@@ -97,8 +95,6 @@ export const ThreadListSidebar = React.memo(function ThreadListSidebar({
                 </div>
               </div>
             </SidebarMenuButton>
-
-            {user?.email ? <SignOutButton /> : <LoginButton />}
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
