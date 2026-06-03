@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 function LoginButton() {
   return (
     <Button
-    variant="outline"
-      className="rounded-xl p-2 text-white text-xs md:p-1"
+      variant="outline"
+      className="rounded-xl p-2 text-foreground text-xs md:p-1"
       onClick={() =>
         signIn("google", {
           redirectTo: "/",
@@ -21,9 +21,11 @@ function LoginButton() {
 
 function SignOutButton() {
   return (
-    <Button variant="destructive" 
-    className="rounded-xl p-2 text-xs"
-    onClick={() => signOut()}>
+    <Button
+      variant="destructive"
+      className="rounded-xl p-2 text-xs"
+      onClick={() => signOut()}
+    >
       Sign Out
     </Button>
   );

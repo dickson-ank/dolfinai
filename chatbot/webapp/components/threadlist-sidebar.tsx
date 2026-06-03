@@ -1,7 +1,8 @@
-import type * as React from "react";
-import { MessagesSquare } from "lucide-react";
-import { GitHubIcon } from "@/components/github";
+"use client";
+
+import * as React from "react";
 import Image from "next/image";
+import { useUser } from "@/lib/user-creds-provider";
 
 import {
   Sidebar,
@@ -13,11 +14,29 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { ThreadList } from "@/components/thread-list";
+import { SignOutButton, LoginButton } from "@/components/auth-buttons";
 
-export function ThreadListSidebar({
+import { ThreadList } from "@/components/thread-list";
+import type { Thread } from "@/lib/hooks/use-threads";
+
+type ThreadListSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  threads: Thread[];
+  loadingThreads: boolean;
+  activeThreadId: string | null;
+  onThreadSelect: (threadId: string) => void;
+  onNewThread: () => void;
+};
+
+export const ThreadListSidebar = React.memo(function ThreadListSidebar({
+  threads,
+  loadingThreads,
+  activeThreadId,
+  onThreadSelect,
+  onNewThread,
   ...props
-}: React.ComponentProps<typeof Sidebar>) {
+}: ThreadListSidebarProps) {
+  const user = useUser();
+
   return (
     <Sidebar {...props}>
       <SidebarHeader className="aui-sidebar-header mb-2 border-b">
@@ -25,10 +44,7 @@ export function ThreadListSidebar({
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild>
-                <a href="/" target="_blank" rel="noopener noreferrer">
-                  {/* <div className="aui-sidebar-header-icon-wrapper bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                    <MessagesSquare className="aui-sidebar-header-icon size-4" />
-                  </div> */}
+                <div>
                   <Image
                     src="/images/favicon.ico"
                     alt="DolFin AI Logo"
@@ -40,39 +56,52 @@ export function ThreadListSidebar({
                       Dolfin AI
                     </span>
                   </div>
-                </a>
+                </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </div>
       </SidebarHeader>
-      <SidebarContent className="aui-sidebar-content px-2">
-        <ThreadList />
+
+      <SidebarContent className="aui-sidebar-content px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ThreadList
+          threads={threads}
+          loading={loadingThreads}
+          activeThreadId={activeThreadId}
+          onThreadSelect={onThreadSelect}
+          onNewThread={onNewThread}
+        />
       </SidebarContent>
+
       <SidebarRail />
-      {/* <SidebarFooter className="aui-sidebar-footer border-t">
+
+      <SidebarFooter className="aui-sidebar-footer border-t">
         <SidebarMenu>
-          <SidebarMenuItem>
+          <SidebarMenuItem className="mt-2 flex flex-col items-start justify-center">
             <SidebarMenuButton size="lg" asChild>
-              <a
-                href="https://github.com/assistant-ui/assistant-ui"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <div className="aui-sidebar-footer-icon-wrapper bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <GitHubIcon className="aui-sidebar-footer-icon size-4" />
-                </div>
+              <div>
+                <Image
+                  src={user?.image || "/images/default-avatar.png"}
+                  alt="User Avatar"
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
                 <div className="aui-sidebar-footer-heading flex flex-col gap-0.5 leading-none">
                   <span className="aui-sidebar-footer-title font-semibold">
-                    GitHub
+                    {user?.name || "Guest"}
                   </span>
-                  <span>View Source</span>
+                  <span className="aui-sidebar-footer-email text-xs text-muted-foreground">
+                    {user?.email || "Not logged in"}
+                  </span>
                 </div>
-              </a>
+              </div>
             </SidebarMenuButton>
+
+            {user?.email ? <SignOutButton /> : <LoginButton />}
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarFooter> */}
+      </SidebarFooter>
     </Sidebar>
   );
-}
+});

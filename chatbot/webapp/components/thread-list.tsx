@@ -1,110 +1,71 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  AuiIf,
-  ThreadListItemMorePrimitive,
-  ThreadListItemPrimitive,
-  ThreadListPrimitive,
-} from "@assistant-ui/react";
-import {
-  ArchiveIcon,
-  MoreHorizontalIcon,
-  PlusIcon,
-  TrashIcon,
-} from "lucide-react";
+import { PlusIcon } from "lucide-react";
+import { memo } from "react";
 import type { FC } from "react";
+import type { Thread } from "@/lib/hooks/use-threads";
 
-export const ThreadList: FC = () => {
-  return (
-    <ThreadListPrimitive.Root className="aui-root aui-thread-list-root flex flex-col gap-1">
-      <ThreadListNew />
-      <AuiIf condition={(s) => s.threads.isLoading}>
-        <ThreadListSkeleton />
-      </AuiIf>
-      <AuiIf condition={(s) => !s.threads.isLoading}>
-        <ThreadListPrimitive.Items>
-          {() => <ThreadListItem />}
-        </ThreadListPrimitive.Items>
-      </AuiIf>
-    </ThreadListPrimitive.Root>
-  );
+type Props = {
+  threads: Thread[];
+  loading: boolean;
+  activeThreadId: string | null;
+  onThreadSelect: (threadId: string) => void;
+  onNewThread: () => void;
 };
 
-const ThreadListNew: FC = () => {
-  return (
-    <ThreadListPrimitive.New asChild>
-      <Button
-        variant="outline"
-        className="aui-thread-list-new hover:bg-muted data-active:bg-muted h-8 justify-start gap-2 rounded-xl px-2 text-xs"
-      >
-        <PlusIcon className="size-2" />
-        New Thread
-      </Button>
-    </ThreadListPrimitive.New>
-  );
-};
-
-const ThreadListSkeleton: FC = () => {
+export const ThreadList: FC<Props> = memo(function ThreadList({
+  threads,
+  loading,
+  activeThreadId,
+  onThreadSelect,
+  onNewThread,
+}) {
   return (
     <div className="flex flex-col gap-1">
-      {Array.from({ length: 5 }, (_, i) => (
-        <div
-          key={i}
-          role="status"
-          aria-label="Loading threads"
-          className="aui-thread-list-skeleton-wrapper flex h-9 items-center px-3"
-        >
-          <Skeleton className="aui-thread-list-skeleton h-4 w-full" />
+      <Button
+        variant="outline"
+        onClick={onNewThread}
+        className="h-8 justify-start gap-2 rounded-xl px-2 text-xs"
+      >
+        <PlusIcon className="size-3" />
+        New Thread
+      </Button>
+
+      {loading ? (
+        <ThreadListSkeleton />
+      ) : (
+        <div className="mt-2 flex flex-col gap-1">
+          {threads.map((thread) => {
+            const isActive = activeThreadId === thread.threadId;
+
+            return (
+              <button
+                key={thread.threadId}
+                onClick={() => onThreadSelect(thread.threadId)}
+                className={`flex h-8 items-center rounded-xl px-2 text-left text-xs transition-colors ${
+                  isActive ? "bg-muted" : "hover:bg-muted"
+                }`}
+              >
+                <span className="truncate">{thread.title || "New Chat"}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+});
+
+const ThreadListSkeleton = memo(function ThreadListSkeleton() {
+  return (
+    <div className="flex flex-col gap-1">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="flex h-9 items-center px-3">
+          <Skeleton className="h-4 w-full" />
         </div>
       ))}
     </div>
   );
-};
-
-const ThreadListItem: FC = () => {
-  return (
-    <ThreadListItemPrimitive.Root className="aui-thread-list-item group hover:bg-muted focus-visible:bg-muted data-active:bg-muted flex h-8 items-center gap-2 rounded-xl transition-colors focus-visible:outline-none">
-      <ThreadListItemPrimitive.Trigger className="aui-thread-list-item-trigger flex h-full min-w-0 flex-1 items-center px-2 text-start text-xs">
-        <span className="aui-thread-list-item-title min-w-0 flex-1 truncate">
-          <ThreadListItemPrimitive.Title fallback="New Chat" />
-        </span>
-      </ThreadListItemPrimitive.Trigger>
-      <ThreadListItemMore />
-    </ThreadListItemPrimitive.Root>
-  );
-};
-
-const ThreadListItemMore: FC = () => {
-  return (
-    <ThreadListItemMorePrimitive.Root>
-      <ThreadListItemMorePrimitive.Trigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="aui-thread-list-item-more data-[state=open]:bg-accent me-2 size-7 p-0 opacity-0 transition-opacity group-hover:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100"
-        >
-          <MoreHorizontalIcon className="size-4" />
-          <span className="sr-only">More options</span>
-        </Button>
-      </ThreadListItemMorePrimitive.Trigger>
-      <ThreadListItemMorePrimitive.Content
-        side="bottom"
-        align="start"
-        className="aui-thread-list-item-more-content bg-popover text-popover-foreground z-50 min-w-32 overflow-hidden rounded-md border p-1 shadow-md"
-      >
-        <ThreadListItemPrimitive.Archive asChild>
-          <ThreadListItemMorePrimitive.Item className="aui-thread-list-item-more-item hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none">
-            <ArchiveIcon className="size-4" />
-            Archive
-          </ThreadListItemMorePrimitive.Item>
-        </ThreadListItemPrimitive.Archive>
-        <ThreadListItemPrimitive.Delete asChild>
-          <ThreadListItemMorePrimitive.Item className="aui-thread-list-item-more-item text-destructive hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none">
-            <TrashIcon className="size-4" />
-            Delete
-          </ThreadListItemMorePrimitive.Item>
-        </ThreadListItemPrimitive.Delete>
-      </ThreadListItemMorePrimitive.Content>
-    </ThreadListItemMorePrimitive.Root>
-  );
-};
+});

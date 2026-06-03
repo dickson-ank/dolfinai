@@ -79,7 +79,10 @@ export async function POST(req: NextRequest) {
   // Ensure thread exists in local DB
   let threadId = incomingThreadId;
   if (!threadId || !(await getThread(threadId))) {
-    threadId = await createThread(userId);
+    threadId = await createThread(
+      userId,
+      `${message.split(" ", 10).join(" ")}...`,
+    );
   }
 
   // Save USER message
@@ -119,26 +122,58 @@ export async function POST(req: NextRequest) {
   // Stream response back to client
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
-  let fullResponse = "";
+
+  let assistantText = "";
+  let buffer = "";
 
   const stream = new ReadableStream({
     async start(controller) {
       while (true) {
         const { done, value } = await reader.read();
+
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        fullResponse += chunk;
-        console.log("GCP chunk:", chunk);
+        const chunk = decoder.decode(value, {
+          stream: true,
+        });
+
+        // forward original stream to frontend
         controller.enqueue(value);
+
+        // parse text for DB storage
+        buffer += chunk;
+
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+
+          if (!trimmed) continue;
+
+          try {
+            const parsed = JSON.parse(trimmed);
+
+            const text = parsed?.content?.parts?.[0]?.text ?? "";
+
+            if (text) {
+              assistantText += text;
+            }
+          } catch {
+            // ignore malformed lines
+          }
+        }
       }
 
-      // Save ASSISTANT message after stream ends
-      await saveMessage({ threadId, role: "assistant", content: fullResponse });
+      await saveMessage({
+        threadId,
+        role: "assistant",
+        content: assistantText,
+      });
+
       controller.close();
     },
   });
-
   return new Response(stream, {
     headers: {
       "Content-Type": "text/event-stream",

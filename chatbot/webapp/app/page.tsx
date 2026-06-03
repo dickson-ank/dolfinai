@@ -1,10 +1,13 @@
-import { Assistant } from "./assistant";
+import { Assistant } from "@/components/assistant";
 import { auth } from "@/lib/auth";
+import UserProvider from "@/lib/user-creds-provider";
 
-import { LoginButton, SignOutButton } from "@/components/auth-buttons";
 
 export default async function Home() {
   const session = await auth();
-  console.log("Session:", session);
-  return <Assistant />;
+  return(<>
+  <UserProvider user={session?.user}>
+  <Assistant />
+</UserProvider>
+</>)
 }

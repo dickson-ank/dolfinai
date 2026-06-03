@@ -2,6 +2,7 @@ import {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
+  QueryCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 
@@ -21,7 +22,7 @@ export async function getThread(threadId: string) {
   return res.Item;
 }
 
-export async function createThread(userId: string) {
+export async function createThread(userId: string, title: string) {
   const threadId = `thread_${nanoid(12)}`;
 
   await db.send(
@@ -30,10 +31,10 @@ export async function createThread(userId: string) {
       Item: {
         threadId,
         userId,
-        title: "New chat",
+        title: title,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        agentSessionId: threadId, // 👈 SAME AS THREAD ID
+        agentSessionId: threadId, // SAME AS THREAD ID
       },
     }),
   );
@@ -52,4 +53,20 @@ export async function touchThread(threadId: string) {
       },
     }),
   );
+}
+
+export async function listThreadsByUser(userId: string) {
+  const res = await db.send(
+    new QueryCommand({
+      TableName: "Threads",
+      IndexName: "UserId-index",
+      KeyConditionExpression: "userId = :u",
+      ExpressionAttributeValues: {
+        ":u": userId,
+      },
+      ScanIndexForward: false,
+    }),
+  );
+
+  return res.Items ?? [];
 }

@@ -119,7 +119,7 @@ const ThreadWelcome: FC = () => {
             Dolfin AI
           </h1>
           <p className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both text-muted-foreground text-xl delay-75 duration-200">
-            How can I help you today?
+            Got any tasks for me?
           </p>
         </div>
       </div>
