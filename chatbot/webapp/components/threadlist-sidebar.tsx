@@ -81,7 +81,7 @@ export const ThreadListSidebar = React.memo(function ThreadListSidebar({
             <SidebarMenuButton size="lg" asChild>
               <div>
                 <Image
-                  src={user?.image || "/images/default-avatar.png"}
+                  src={user?.image || "/images/default-avatar.jpg"}
                   alt="User Avatar"
                   width={32}
                   height={32}

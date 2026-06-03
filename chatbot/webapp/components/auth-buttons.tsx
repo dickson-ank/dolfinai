@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button";
 
 function LoginButton() {
   return (
-    <Button
-      variant="outline"
-      className="rounded-xl p-2 text-foreground text-xs md:p-1"
+    <button
+      className="rounded-xl p-1 text-background text-xs bg-foreground/90 border border-2 ml-3"
       onClick={() =>
         signIn("google", {
           redirectTo: "/",
@@ -15,19 +14,18 @@ function LoginButton() {
       }
     >
       Sign In
-    </Button>
+    </button>
   );
 }
 
 function SignOutButton() {
   return (
-    <Button
-      variant="destructive"
-      className="rounded-xl p-2 text-xs"
+    <button
+      className="rounded-xl p-1 text-xs text-background bg-foreground/90 border border-2 ml-3"
       onClick={() => signOut()}
     >
       Sign Out
-    </Button>
+    </button>
   );
 }
 
